@@ -1,7 +1,12 @@
 from rest_framework import serializers
 from .models import ImportJob
 
-class ImportJobSerializer(serializers.ModelSerializer):
+class ImportJobCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ImportJob
+        fields = ["id", "status", "created_at"]
+class ImportJobStatusSerializer(serializers.ModelSerializer):
+    progress_percent = serializers.SerializerMethodField()
     class Meta:
         model = ImportJob
         # fields = "__all__"
@@ -16,8 +21,8 @@ class ImportJobSerializer(serializers.ModelSerializer):
             "updated_at",
         ]
 
-        def get_progress_percent(self, obj):
-            if not obj.total_rows:
-                return 0
-            return int((obj.processed_rows)/(obj.total_rows)*100)
+    def get_progress_percent(self, obj):
+        if not obj.total_rows:
+            return 0
+        return int((obj.processed_rows)/(obj.total_rows)*100)
         

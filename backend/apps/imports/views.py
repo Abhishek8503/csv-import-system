@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import ImportJob
-from .serializers import ImportJobSerializer
+from .serializers import ImportJobStatusSerializer, ImportJobCreateSerializer
 from .tasks import process_csv_import
 # Create your views here.
 
@@ -20,14 +20,14 @@ class CSVUploadView(APIView):
         
         import_job = ImportJob.objects.create(file=file)
         process_csv_import.delay(import_job.id)
-        serializer = ImportJobSerializer(import_job)
+        serializer = ImportJobCreateSerializer(import_job)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ImportJobStatusView(APIView):
     def get(self, request, job_id):
         job = get_object_or_404(ImportJob, id=job_id)
-        serializer = ImportJobSerializer(job)
+        serializer = ImportJobStatusSerializer(job)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ImportJobRetryView(APIView):

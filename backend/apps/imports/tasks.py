@@ -24,51 +24,53 @@ def process_csv_import(self, import_job_id):
 
         with open(file_path, newline="", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile)
-            
             rows = list(reader)
-            total_rows = len(rows)
-            job.total_rows = total_rows
-            job.save(update_fields=["total_rows"])
+        total_rows = len(rows)
+        job.total_rows = total_rows
+        job.processed_rows = 0
+        job.save(update_fields=["total_rows", "processed_rows"])
 
-            BATCH_SIZE = 1000
-            batch = []
+        BATCH_SIZE = 1000
+        batch = []
+        processed = 0
 
-            for index, row in enumerate(rows, start=1):
-                sku = row.get("sku", "").strip()
-                name = row.get("name", "").strip()
-                price = row.get("price", "0").strip()
+        for row in rows:
+            sku = row.get("sku", "").strip()
+            name = row.get("name", "").strip()
+            price = row.get("price", "0").strip()
 
-                if not sku:
-                    continue
+            if not sku:
+                continue
 
-                try:
-                    price = Decimal(price)
-                except Exception:
-                    price = Decimal("0.00")
+            sku_normalized = sku.lower()
+            product = Product(
+                sku = sku_normalized,
+                name = name,
+                price = price or 0,
+            )
+            
+            batch.append(product)
+            processed += 1
 
-                sku_normalized = sku.lower()
-                product = Product(
-                    sku = sku_normalized,
-                    name = name,
-                    price = price,
-                )
-
-                batch.append(product)
-
-                if len(batch) >= BATCH_SIZE:
-                    _bulk_upsert_products(batch)
-                    batch.clear()
-
-                    job.processed_rows = index
-                    job.save(update_fields=["processed_rows"])
-
-            if batch:
+            if len(batch) >= BATCH_SIZE:
                 _bulk_upsert_products(batch)
-                job.processed_rows = total_rows
+                batch.clear()
+
+                job.processed_rows = processed
                 job.save(update_fields=["processed_rows"])
-        
+
+            # try:
+            #     price = Decimal(price)
+            # except Exception:
+            #     price = Decimal("0.00")
+
+
+        if batch:
+            _bulk_upsert_products(batch)
+
+        job.processed_rows = total_rows
         job.status = ImportJob.Status.COMPLETED
-        job.save(update_fields=["status"])
+        job.save(update_fields=["processed_rows", "status"])
     
     except Exception as e:
         job.status = ImportJob.Status.FAILED
