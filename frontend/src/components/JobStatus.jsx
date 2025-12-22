@@ -35,6 +35,21 @@ export default function JobStatus({ jobId }) {
         };
     }, [jobId]);
 
+    useEffect(()=> {
+        const handleBeforeUnload = (e)=> {
+            if(job && (job.status === "PROCESSING" || job.status === "PENDING")){
+                e.preventDefault();
+                e.returnValue = "";
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return ()=> {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [job]);
+
     if (!jobId || !job) return null;
 
     return (
