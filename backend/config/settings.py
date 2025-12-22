@@ -51,7 +51,7 @@ INSTALLED_APPS = [
 
     'apps.imports',
     'apps.products',
-    # 'django_celery_results',
+    'django_celery_results',
     'corsheaders',
 ]
 
@@ -143,9 +143,9 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-# CELERY_BROKER_URL = "redis://localhost:6379/0"
-# CELERY_ACCEPT_CONTENT = ["json"]
-# CELERY_TASK_SERIALIZER = "json"
-# CELERY_RESULT_BACKEND = "django-db"
-# CELERY_WORKER_POOL = "solo"
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_WORKER_POOL = "solo"
 CORS_ALLOW_ALL_ORIGINS = True
