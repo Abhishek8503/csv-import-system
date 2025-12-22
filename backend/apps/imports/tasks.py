@@ -24,6 +24,8 @@ def process_csv_import(self, import_job_id):
 
         with open(file_path, newline="", encoding="utf-8") as csvfile:
             reader = csv.DictReader(csvfile)
+            if "sku" not in reader.fieldnames:
+                raise ValueError("CSV Must Contain a 'sku' column.")
             rows = list(reader)
         total_rows = len(rows)
         job.total_rows = total_rows
