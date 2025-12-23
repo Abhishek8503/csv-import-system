@@ -8,13 +8,14 @@ import JobStatus from './components/JobStatus'
 function App() {
   const [count, setCount] = useState(0)
   const [jobId, setJobId] = useState(null);
+  const [jobStatus, setJobStatus] = useState(null);
 
   return (
     <>
     <div style={{padding: '2rem'}}>
       <h2>CSV Import System</h2>
-      <UploadForm onJobCreated={setJobId} />
-      <JobStatus jobId={jobId} />
+      <UploadForm onJobCreated={setJobId} jobStatus={jobStatus} />
+      <JobStatus jobId={jobId} onStatusChange={setJobStatus} />
     </div>
       {/* <div>
         <a href="https://vite.dev" target="_blank">

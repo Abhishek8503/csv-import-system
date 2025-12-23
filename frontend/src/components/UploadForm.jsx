@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { uploadCSV } from "../api";
 
-export default function UploadForm({ onJobCreated }) {
+export default function UploadForm({ onJobCreated, jobStatus }) {
     const [file, setFile] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -26,10 +26,13 @@ export default function UploadForm({ onJobCreated }) {
             <input 
                 type="file"
                 accept=".csv"
+                disabled={loading || jobStatus === "PENDING" || jobStatus === "PROCESSING"}
                 onChange={(e) => setFile(e.target.files[0])}
             />
-            <button type="submit" disabled={loading}>
-                {loading ? "Uploading..." : "Upload CSV"}
+            <button type="submit" disabled={loading || jobStatus === "PROCESSING" || jobStatus === "PENDING"}>
+                {loading ? 
+                    "Uploading..." : jobStatus === "PENDING" || jobStatus === "PROCESSING" 
+                    ? "Processing..." : "Upload CSV"}
             </button>
         </form>
         </>

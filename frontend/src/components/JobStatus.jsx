@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { fetchJobStatus, retryJob } from "../api";
 
-export default function JobStatus({ jobId }) {
+export default function JobStatus({ jobId, onStatusChange }) {
     const [job, setJob] = useState(null);
 
     useEffect(() => {
@@ -15,6 +15,7 @@ export default function JobStatus({ jobId }) {
         const poll = async () => {
             try {
                 const data = await fetchJobStatus(jobId);
+                onStatusChange(data.status)
                 setJob(data);
                 
                 if (data.status === "PENDING" || data.status === "PROCESSING") {
